@@ -3,10 +3,12 @@ from numpy._typing import NDArray
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, CheckButtons, Button
 from matplotlib.backend_bases import Event
-from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PIL import Image
 from pathlib import Path
-from typing import Literal, Any, Optional, Callable
+from typing import Literal, Any, Optional, Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 class DaVinciEffector3DViz:
     """3D visualization of the proposed model using matplotlib."""
@@ -381,8 +383,8 @@ if __name__ == "__main__":
     # ==== Example ====
     viz = DaVinciEffector3DViz()
 
-    def printa(event: Event):
-        print(f"AAAAA {event}")
-    viz.ext_create_user_button("Printa", printa,width=1)
+    def notify(event: Event):
+        print(f"User button pressed {event}")
+    viz.ext_create_user_button("User button !", notify, width=0.5)
 
     viz.run(True)
