@@ -3,12 +3,10 @@ from numpy._typing import NDArray
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, CheckButtons, Button
 from matplotlib.backend_bases import Event
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PIL import Image
 from pathlib import Path
-from typing import Literal, Any, Optional, Callable, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from mpl_toolkits.mplot3d.axes3d import Axes3D
+from typing import Literal, Any, Optional, Callable
 
 class DaVinciEffector3DViz:
     """3D visualization of the proposed model using matplotlib."""
@@ -39,7 +37,7 @@ class DaVinciEffector3DViz:
         self.create_dial_images()
         self.create_inverse_checkbox()
         self.create_reset_button()
-        self.user_button: Button | None = None
+        self.user_buttons: list[Button] = []
 
         self.impossible_text = self.ax.text2D(
             0.5, 0.95, "", transform=self.fig.transFigure,
@@ -365,7 +363,7 @@ class DaVinciEffector3DViz:
             plt.ion()
         plt.show()
 
-    def ext_create_user_button(self, name: str, user_button_action: Callable[[Event], Any], color: str = 'peachpuff', hover_color: str = 'chocolate', width: float = 0.08) -> None:
+    def ext_create_user_button(self, name: str, user_button_action: Callable[[Event], Any], color: str = 'peachpuff', hover_color: str = 'chocolate', width: float = 0.08, x: float = 0.20, y: float = 0.92) -> None:
         """Create a user button (external call) if needed
         
         Args:
@@ -373,18 +371,16 @@ class DaVinciEffector3DViz:
             user_button_action (Callable[[Event], Any): function to call when pressing the button
             color (str, optional): idle color. Defaults to 'peachpuff'
             hover_color (str, optional): color when hovering. Defaults to 'chocolate'
-            width (float, optional): width of the button. Defaults to 0.08"""
+            width (float, optional): width of the button. Defaults to 0.08
+            x (float, optional): x position
+            y (float, optional): y position"""
         print("Creating user button")
-        user_button_ax = plt.axes((0.20, 0.92, width, 0.05), facecolor= color)  # Position: [left, bottom, width, height]
-        self.user_button = Button(user_button_ax, name, color=color, hovercolor=hover_color)
-        self.user_button.on_clicked(user_button_action)
+        user_button_ax = plt.axes((x, y, width, 0.05), facecolor= color)  # Position: [left, bottom, width, height]
+        new_button = Button(user_button_ax, name, color=color, hovercolor=hover_color)
+        new_button.on_clicked(user_button_action)
+        self.user_buttons.append(new_button)
 
 if __name__ == "__main__":
     # ==== Example ====
     viz = DaVinciEffector3DViz()
-
-    def notify(event: Event):
-        print(f"User button pressed {event}")
-    viz.ext_create_user_button("User button !", notify, width=0.5)
-
     viz.run(True)
