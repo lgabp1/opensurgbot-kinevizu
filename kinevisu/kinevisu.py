@@ -1,14 +1,19 @@
 import numpy as np
-from numpy._typing import NDArray
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, CheckButtons, Button
 from matplotlib.backend_bases import Event
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PIL import Image
 from pathlib import Path
-from typing import Literal, Any, Optional, Callable
 
-class DaVinciEffector3DViz:
+from typing import Any, Optional, Callable, Union
+from typing_extensions import Literal
+try:
+    from numpy._typing import NDArray
+except ImportError:
+    from numpy.typing import NDArray
+
+class DeehliViz:
     """3D visualization of the proposed model using matplotlib."""
     DIAL_POSITIONS = [(0.05, 0.55), (0.55, 0.55), (0.05, 0.05), (0.55, 0.05)]
     l1, l2, l3 = 0.015, 0.008, 0.0095 # m
@@ -71,10 +76,10 @@ class DaVinciEffector3DViz:
         self.sliders[1].set_val(0) # Pitch
         self.sliders[2].set_val(0) # Jaw 1
         self.sliders[3].set_val(0) # Jaw 2
-        self.sliders[4].set_val(np.degrees(DaVinciEffector3DViz.theta_1_offset)) # Control 1 (with offset)
-        self.sliders[5].set_val(np.degrees(DaVinciEffector3DViz.theta_2_offset)) # Control 2 (with offset)
-        self.sliders[6].set_val(np.degrees(DaVinciEffector3DViz.theta_3_offset)) # Control 3 (with offset)
-        self.sliders[7].set_val(np.degrees(DaVinciEffector3DViz.theta_4_offset)) # Control 4 (with offset)
+        self.sliders[4].set_val(np.degrees(DeehliViz.theta_1_offset)) # Control 1 (with offset)
+        self.sliders[5].set_val(np.degrees(DeehliViz.theta_2_offset)) # Control 2 (with offset)
+        self.sliders[6].set_val(np.degrees(DeehliViz.theta_3_offset)) # Control 3 (with offset)
+        self.sliders[7].set_val(np.degrees(DeehliViz.theta_4_offset)) # Control 4 (with offset)
         if self.do_inverse:
             self.on_angle_slider_change(None)
         else:
@@ -87,7 +92,7 @@ class DaVinciEffector3DViz:
         ax_checkbox = plt.axes((0.43, 0.02, 0.20, 0.05), facecolor=None)
         self.checkbox = CheckButtons(ax_checkbox, ['Inverse Kinematics ?'], [self.do_inverse])
         
-        def on_checkbox_clicked(label: str | None):
+        def on_checkbox_clicked(label: Union[str, None]):
             self.do_inverse = not self.do_inverse
             print("self.do_inverse set to:", self.do_inverse)
             # Update the plot to reflect current slider values under new mode
@@ -122,7 +127,7 @@ class DaVinciEffector3DViz:
             Slider(self.control_slider_axes[3], 'Control $\\theta_4$', -180, 180, valinit=0),
         ]
 
-        marker_values: list[tuple[float,float] | Any] = [(-270, 270),
+        marker_values: list[ Union[tuple[float,float], Any] ] = [(-270, 270),
                          (-80, 80),
                          (-100, 100),
                          (-100, 100),
@@ -150,7 +155,7 @@ class DaVinciEffector3DViz:
         self.ax_dial.set_xlim(0, 1)
         self.ax_dial.set_ylim(0, 1)
 
-        positions = DaVinciEffector3DViz.DIAL_POSITIONS
+        positions = DeehliViz.DIAL_POSITIONS
         labels = ["1", "2", "3", "4"]
 
         self.dial_artists.clear()
@@ -163,7 +168,7 @@ class DaVinciEffector3DViz:
 
     def update_dials(self) -> None: # Update the dials' angles
         angles = [self.sliders[4].val, self.sliders[5].val, self.sliders[6].val, self.sliders[7].val] # Have the offsets
-        positions = DaVinciEffector3DViz.DIAL_POSITIONS
+        positions = DeehliViz.DIAL_POSITIONS
 
         for artist, angle, pos in zip(self.dial_artists, angles, positions):
             rotated = self.dial_img.rotate(angle, resample=Image.Resampling.BICUBIC)
@@ -173,7 +178,7 @@ class DaVinciEffector3DViz:
     def on_angle_slider_change(self, val: float) -> None: # Callback when a (output) slider has changed
         if self.do_inverse is True:
             # Update the 3D visualisation accordingly
-            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DaVinciEffector3DViz.theta_1_offset, DaVinciEffector3DViz.theta_2_offset, DaVinciEffector3DViz.theta_3_offset, DaVinciEffector3DViz.theta_4_offset
+            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DeehliViz.theta_1_offset, DeehliViz.theta_2_offset, DeehliViz.theta_3_offset, DeehliViz.theta_4_offset
             pitch, roll, jaw1, jaw2 = map(np.radians, [self.sliders[1].val, self.sliders[0].val, self.sliders[2].val, self.sliders[3].val])
             theta_1, theta_2, theta_3, theta_4 = 0.0, 0.0, 0.0, 0.0
 
@@ -212,17 +217,19 @@ class DaVinciEffector3DViz:
             pass #do nothing in this case
         else: # FORWARD KINEMATICS
             # Update values
-            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DaVinciEffector3DViz.theta_1_offset, DaVinciEffector3DViz.theta_2_offset, DaVinciEffector3DViz.theta_3_offset, DaVinciEffector3DViz.theta_4_offset
+            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DeehliViz.theta_1_offset, DeehliViz.theta_2_offset, DeehliViz.theta_3_offset, DeehliViz.theta_4_offset
             self.theta_1, self.theta_2, self.theta_3, self.theta_4 = map(np.radians, [self.sliders[4].val, self.sliders[5].val, self.sliders[6].val, self.sliders[7].val])
             theta_1, theta_2, theta_3, theta_4 = self.theta_1 - theta_1_offset, self.theta_2 - theta_2_offset, self.theta_3 - theta_3_offset, self.theta_4 - theta_4_offset
             pitch, roll, jaw1, jaw2 = 0., 0., 0., 0.
 
             roll = 270/170*theta_2
-
-            pitch = - 80/80 * theta_1
-
-            jaw1 = 110/90*(theta_3 - 70/80*theta_1)
-            jaw2 = 110/90*(theta_4 - 70/80*theta_1)
+            
+            rel_matrix = np.array([
+                [-80/80       , 0       , 0     ],
+                [-70/80*110/90, 110/90  , 0     ],
+                [-70/80*110/90, 0       , 110/90],
+            ])
+            pitch, jaw1, jaw2 = rel_matrix @ np.array([theta_1, theta_3, theta_4])
             
             # Update
             self.roll, self.pitch, self.jaw1, self.jaw2 = roll, pitch, jaw1, jaw2
@@ -382,5 +389,5 @@ class DaVinciEffector3DViz:
 
 if __name__ == "__main__":
     # ==== Example ====
-    viz = DaVinciEffector3DViz()
+    viz = DeehliViz()
     viz.run(True)
