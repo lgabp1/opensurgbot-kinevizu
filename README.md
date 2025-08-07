@@ -1,6 +1,7 @@
-# opensurgbot-kinevizu
+# opensurgbot_kinevizu
 
 Submodule of [opensurgbot](https://github.com/lgabp1/opensurgbot).
+
 Kinematic model and kinematic visualization for the da Vinci Large Needle Driver (Model No. 420006).
 
 # Repository content
