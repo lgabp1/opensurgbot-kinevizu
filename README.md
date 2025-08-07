@@ -26,7 +26,7 @@ A basic 3D matplotlib application to help verifying the model.
 
 ### Usage
 
-Simply run the provided script with python `python kinevisu.py`, or import the `DeehliViz` class in an external script.
+Simply run the provided script with python `python kinevisu.py`, or import the `OpensurgbotViz` class in an external script.
 
 # License
 

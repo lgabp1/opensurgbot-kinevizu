@@ -13,7 +13,7 @@ try:
 except ImportError:
     from numpy.typing import NDArray
 
-class DeehliViz:
+class OpensurgbotViz:
     """3D visualization of the proposed model using matplotlib."""
     DIAL_POSITIONS = [(0.05, 0.55), (0.55, 0.55), (0.05, 0.05), (0.55, 0.05)]
     l1, l2, l3 = 0.015, 0.008, 0.0095 # m
@@ -76,10 +76,10 @@ class DeehliViz:
         self.sliders[1].set_val(0) # Pitch
         self.sliders[2].set_val(0) # Jaw 1
         self.sliders[3].set_val(0) # Jaw 2
-        self.sliders[4].set_val(np.degrees(DeehliViz.theta_1_offset)) # Control 1 (with offset)
-        self.sliders[5].set_val(np.degrees(DeehliViz.theta_2_offset)) # Control 2 (with offset)
-        self.sliders[6].set_val(np.degrees(DeehliViz.theta_3_offset)) # Control 3 (with offset)
-        self.sliders[7].set_val(np.degrees(DeehliViz.theta_4_offset)) # Control 4 (with offset)
+        self.sliders[4].set_val(np.degrees(OpensurgbotViz.theta_1_offset)) # Control 1 (with offset)
+        self.sliders[5].set_val(np.degrees(OpensurgbotViz.theta_2_offset)) # Control 2 (with offset)
+        self.sliders[6].set_val(np.degrees(OpensurgbotViz.theta_3_offset)) # Control 3 (with offset)
+        self.sliders[7].set_val(np.degrees(OpensurgbotViz.theta_4_offset)) # Control 4 (with offset)
         if self.do_inverse:
             self.on_angle_slider_change(None)
         else:
@@ -155,7 +155,7 @@ class DeehliViz:
         self.ax_dial.set_xlim(0, 1)
         self.ax_dial.set_ylim(0, 1)
 
-        positions = DeehliViz.DIAL_POSITIONS
+        positions = OpensurgbotViz.DIAL_POSITIONS
         labels = ["1", "2", "3", "4"]
 
         self.dial_artists.clear()
@@ -168,7 +168,7 @@ class DeehliViz:
 
     def update_dials(self) -> None: # Update the dials' angles
         angles = [self.sliders[4].val, self.sliders[5].val, self.sliders[6].val, self.sliders[7].val] # Have the offsets
-        positions = DeehliViz.DIAL_POSITIONS
+        positions = OpensurgbotViz.DIAL_POSITIONS
 
         for artist, angle, pos in zip(self.dial_artists, angles, positions):
             rotated = self.dial_img.rotate(angle, resample=Image.Resampling.BICUBIC)
@@ -178,7 +178,7 @@ class DeehliViz:
     def on_angle_slider_change(self, val: float) -> None: # Callback when a (output) slider has changed
         if self.do_inverse is True:
             # Update the 3D visualisation accordingly
-            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DeehliViz.theta_1_offset, DeehliViz.theta_2_offset, DeehliViz.theta_3_offset, DeehliViz.theta_4_offset
+            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = OpensurgbotViz.theta_1_offset, OpensurgbotViz.theta_2_offset, OpensurgbotViz.theta_3_offset, OpensurgbotViz.theta_4_offset
             pitch, roll, jaw1, jaw2 = map(np.radians, [self.sliders[1].val, self.sliders[0].val, self.sliders[2].val, self.sliders[3].val])
             theta_1, theta_2, theta_3, theta_4 = 0.0, 0.0, 0.0, 0.0
 
@@ -217,7 +217,7 @@ class DeehliViz:
             pass #do nothing in this case
         else: # FORWARD KINEMATICS
             # Update values
-            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = DeehliViz.theta_1_offset, DeehliViz.theta_2_offset, DeehliViz.theta_3_offset, DeehliViz.theta_4_offset
+            theta_1_offset, theta_2_offset, theta_3_offset, theta_4_offset = OpensurgbotViz.theta_1_offset, OpensurgbotViz.theta_2_offset, OpensurgbotViz.theta_3_offset, OpensurgbotViz.theta_4_offset
             self.theta_1, self.theta_2, self.theta_3, self.theta_4 = map(np.radians, [self.sliders[4].val, self.sliders[5].val, self.sliders[6].val, self.sliders[7].val])
             theta_1, theta_2, theta_3, theta_4 = self.theta_1 - theta_1_offset, self.theta_2 - theta_2_offset, self.theta_3 - theta_3_offset, self.theta_4 - theta_4_offset
             pitch, roll, jaw1, jaw2 = 0., 0., 0., 0.
@@ -389,5 +389,5 @@ class DeehliViz:
 
 if __name__ == "__main__":
     # ==== Example ====
-    viz = DeehliViz()
+    viz = OpensurgbotViz()
     viz.run(True)
